@@ -1,6 +1,12 @@
-from email.policy import default
-
+from django.contrib.auth.models import User
 from django.db import models
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=65)
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class Recipe(models.Model):
@@ -17,5 +23,9 @@ class Recipe(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_published = models.BooleanField(default=False)
     cover = models.ImageField(upload_to='recipes/covers/%Y/%m/%d/')
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, null=True)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
-# Create your models here.
+    def __str__(self) -> str:
+        return self.title
