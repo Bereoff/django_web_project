@@ -1,5 +1,3 @@
-from unicodedata import category
-
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import resolve, reverse
@@ -50,7 +48,15 @@ class RecipeViewsTest(TestCase):
             preparation_steps_is_html=False,
             is_published=True,
         )
-        assert 1 == 1
+
+        response = self.client.get(reverse('recipes:home'))
+        content = response.content.decode('utf-8')
+        response_context_recipes = response.context['recipes']
+
+        self.assertIn('Recipe Title', content)
+        self.assertIn('30 minutes', content)
+        self.assertIn('4 people', content)
+        self.assertEqual(len(response_context_recipes), 1)
 
     def test_recipe_category_view_function_is_correct(self):
         view = resolve(reverse('recipes:category',
