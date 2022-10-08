@@ -1,5 +1,3 @@
-from distutils.archive_util import make_archive
-
 from django.core.exceptions import ValidationError
 from parameterized import parameterized
 from recipes.models import Recipe
