@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 
 def add_attr(field, attr_name, attr_new_val):
@@ -66,12 +67,45 @@ class RegisterForm(forms.ModelForm):
                 'required': 'This field must not be empty',
             }
         }
-        widgets = {
-            'first_name': forms.TextInput(attrs={
-                'placeholder': 'Type your username here',
-                'class': 'input text-input'
-            }),
-            'password': forms.PasswordInput(attrs={
-                'placeholder': 'Type your password here'
+
+    def clean_password(self):
+        data = self.cleaned_data.get('password')
+
+        if 'atention' in data:
+            raise ValidationError(
+                "Don't type %(pipoca)s in the password field",
+                code='invalid',
+                params={'pipoca': '"atention"'}
+            )
+
+        return data
+
+    def clean_first_name(self):
+        data = self.cleaned_data.get('first_name')
+
+        if 'John Doe' in data:
+            raise ValidationError(
+                "Don't type %(value)s in the password field",
+                code='invalid',
+                params={'value': '"John Doe"'}
+            )
+
+        return data
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        password = cleaned_data.get('password')
+        password2 = cleaned_data.get('password2')
+
+        if password != password2:
+            password_confirmation_error = ValidationError(
+                'Password and password2 must be equal',
+                code='invalid'
+            )
+            raise ValidationError({
+                'password': password_confirmation_error,
+                'password2': [
+                    password_confirmation_error,
+                ],
             })
-        }
